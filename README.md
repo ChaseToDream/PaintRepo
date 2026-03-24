@@ -78,4 +78,4 @@
 
 ## 许可证
 
-[MIT License](LICENSE)
+[GPL-3.0 License](LICENSE)
