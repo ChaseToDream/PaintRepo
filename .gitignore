@@ -1,0 +1,39 @@
+# IDE / 编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 依赖目录（本项目无依赖）
+node_modules/
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+
+# 构建输出（本项目无需构建）
+dist/
+build/
+out/
+
+# 测试覆盖率
+coverage/
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# TRAE
+.trae/

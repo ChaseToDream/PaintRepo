@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画仓 - AI 绘图作品展示</title>
+    <meta name="description" content="画仓 - 轻量级 AI 绘图作品展示平台">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="index.html" class="text-xl font-bold" style="color: var(--text-primary);">
+                🎨 画仓
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="upload.html" class="btn btn-secondary text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    上传
+                </a>
+                <button id="theme-toggle" class="theme-toggle" title="切换主题">
+                    <span id="theme-icon"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 瀑布流容器 -->
+    <main id="masonry-container" class="masonry-container">
+        <!-- 图片卡片将通过 JavaScript 动态加载 -->
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="footer">
+        <span id="copyright">© 2024 画仓 All Rights Reserved</span>
+    </footer>
+    
+    <!-- 脚本 -->
+    <script src="js/config.js"></script>
+    <script src="js/r2.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // 初始化首页
+        document.addEventListener('DOMContentLoaded', () => {
+            HomePage.init();
+        });
+    </script>
+</body>
+</html>

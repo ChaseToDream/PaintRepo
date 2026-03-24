@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传作品 - 画仓</title>
+    <meta name="description" content="上传 AI 绘图作品">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 密码验证遮罩 -->
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-box">
+            <h2 class="text-xl font-bold mb-6 text-center" style="color: var(--text-primary);">
+                🔐 管理员验证
+            </h2>
+            <div class="form-group">
+                <label class="form-label">请输入管理密码</label>
+                <input 
+                    type="password" 
+                    id="password-input" 
+                    class="form-input" 
+                    placeholder="输入密码..."
+                    onkeypress="if(event.key === 'Enter') UploadPage.verifyPassword()"
+                >
+                <p id="auth-error" class="text-sm mt-2" style="color: #ef4444; display: none;"></p>
+            </div>
+            <button onclick="UploadPage.verifyPassword()" class="btn btn-primary w-full mt-4">
+                验证
+            </button>
+            <a href="index.html" class="block text-center mt-4 text-sm" style="color: var(--text-secondary);">
+                返回首页
+            </a>
+        </div>
+    </div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="index.html" class="text-xl font-bold" style="color: var(--text-primary);">
+                🎨 画仓
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="btn btn-secondary text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    返回首页
+                </a>
+                <button id="theme-toggle" class="theme-toggle" title="切换主题">
+                    <span id="theme-icon"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 上传表单 -->
+    <main id="upload-form" class="pt-20 pb-8 px-4 max-w-3xl mx-auto" style="display: none;">
+        <h1 class="text-2xl font-bold mb-6" style="color: var(--text-primary);">
+            上传作品
+        </h1>
+        
+        <form id="upload-form-element">
+            <!-- 图片上传区域 -->
+            <div class="form-group">
+                <label class="form-label">图片文件 *</label>
+                <div id="upload-area" class="upload-area">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 16px; color: var(--text-secondary);">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <p style="color: var(--text-secondary);">点击或拖拽图片到此处上传</p>
+                    <p style="color: var(--text-secondary); font-size: 12px; margin-top: 8px;">支持 PNG、JPG、WebP 格式</p>
+                </div>
+                <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp" style="display: none;" required>
+                <div id="file-preview" class="mt-4 text-center"></div>
+                <p id="file-name" class="mt-2 text-sm text-center" style="color: var(--text-secondary);"></p>
+            </div>
+            
+            <!-- 作品标题 -->
+            <div class="form-group">
+                <label class="form-label">作品标题（可选）</label>
+                <input type="text" name="title" class="form-input" placeholder="为作品起个名字...">
+            </div>
+            
+            <!-- 正向提示词 -->
+            <div class="form-group">
+                <label class="form-label">正向提示词 (Prompt)</label>
+                <textarea name="prompt" class="form-input form-textarea" placeholder="输入正向提示词..."></textarea>
+            </div>
+            
+            <!-- 负向提示词 -->
+            <div class="form-group">
+                <label class="form-label">负向提示词 (Negative Prompt)</label>
+                <textarea name="negativePrompt" class="form-input form-textarea" placeholder="输入负向提示词..."></textarea>
+            </div>
+            
+            <!-- 模型名称 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">模型名称 (Model)</label>
+                    <input type="text" name="model" class="form-input" placeholder="如: sd_xl_base_1.0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">采样器 (Sampler)</label>
+                    <input type="text" name="sampler" class="form-input" placeholder="如: DPM++ 2M Karras">
+                </div>
+            </div>
+            
+            <!-- 步数和 CFG -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">步数 (Steps)</label>
+                    <input type="number" name="steps" class="form-input" placeholder="如: 30" min="1" max="150">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CFG Scale</label>
+                    <input type="number" name="cfgScale" class="form-input" placeholder="如: 7.5" step="0.1" min="1" max="30">
+                </div>
+            </div>
+            
+            <!-- 分辨率 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">宽度 (Width)</label>
+                    <input type="number" name="width" class="form-input" placeholder="如: 1024" min="64" max="4096" step="64">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">高度 (Height)</label>
+                    <input type="number" name="height" class="form-input" placeholder="如: 1024" min="64" max="4096" step="64">
+                </div>
+            </div>
+            
+            <!-- 种子数和批次 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">种子数 (Seed)</label>
+                    <input type="text" name="seed" class="form-input" placeholder="如: 1234567890">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">批次大小 (Batch Size)</label>
+                    <input type="number" name="batchSize" class="form-input" placeholder="如: 1" min="1" max="8">
+                </div>
+            </div>
+            
+            <!-- VAE 和 CLIP Skip -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label">VAE</label>
+                    <input type="text" name="vae" class="form-input" placeholder="如: sdxl_vae.safetensors">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CLIP Skip</label>
+                    <input type="number" name="clipSkip" class="form-input" placeholder="如: 2" min="1" max="12">
+                </div>
+            </div>
+            
+            <!-- 去噪强度 -->
+            <div class="form-group">
+                <label class="form-label">去噪强度 (Denoising Strength)</label>
+                <input type="number" name="denoisingStrength" class="form-input" placeholder="如: 0.75" step="0.01" min="0" max="1">
+            </div>
+            
+            <!-- 其他参数 -->
+            <div class="form-group">
+                <label class="form-label">其他参数</label>
+                <textarea name="other" class="form-input form-textarea" placeholder="其他需要记录的参数信息..."></textarea>
+            </div>
+            
+            <!-- 提交按钮 -->
+            <div class="form-group mt-8">
+                <button type="submit" id="submit-btn" class="btn btn-primary w-full py-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    上传作品
+                </button>
+            </div>
+        </form>
+    </main>
+    
+    <!-- 脚本 -->
+    <script src="js/config.js"></script>
+    <script src="js/r2.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // 初始化上传页
+        document.addEventListener('DOMContentLoaded', () => {
+            UploadPage.init();
+        });
+    </script>
+</body>
+</html>
