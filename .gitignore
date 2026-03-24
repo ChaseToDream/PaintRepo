@@ -14,7 +14,7 @@ Desktop.ini
 *.log
 npm-debug.log*
 
-# 依赖目录（本项目无依赖）
+# 依赖目录
 node_modules/
 
 # 临时文件
@@ -22,21 +22,13 @@ node_modules/
 *.temp
 .cache/
 
-# 构建输出（本项目无需构建）
+# 构建输出
 dist/
 build/
 out/
 
 # 测试覆盖率
 coverage/
-
-# 环境变量文件
-.env
-.env.local
-.env.*.local
-
-# 本地配置文件（包含敏感信息）
-js/config.local.js
 
 # TRAE
 .trae/

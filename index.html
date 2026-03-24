@@ -5,24 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>画仓 - AI 绘图作品展示</title>
     <meta name="description" content="画仓 - 轻量级 AI 绘图作品展示平台">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <!-- 导航栏 -->
     <nav class="navbar">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="index.html" class="text-xl font-bold" style="color: var(--text-primary);">
-                🎨 画仓
+        <div class="navbar-inner">
+            <a href="index.html" class="navbar-brand">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+                <span>画仓</span>
             </a>
-            <div class="flex items-center gap-4">
-                <a href="upload.html" class="btn btn-secondary text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
+            <div class="navbar-actions">
+                <a href="upload.html" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
                     </svg>
-                    上传
+                    上传作品
                 </a>
                 <button id="theme-toggle" class="theme-toggle" title="切换主题">
                     <span id="theme-icon"></span>
@@ -42,12 +50,10 @@
     </footer>
     
     <!-- 脚本 -->
-    <script src="js/config.local.js"></script>
     <script src="js/config.js"></script>
     <script src="js/r2.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // 初始化首页
         document.addEventListener('DOMContentLoaded', () => {
             HomePage.init();
         });
