@@ -35,5 +35,8 @@ coverage/
 .env.local
 .env.*.local
 
+# 本地配置文件（包含敏感信息）
+js/config.local.js
+
 # TRAE
 .trae/

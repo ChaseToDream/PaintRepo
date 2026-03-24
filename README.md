@@ -91,19 +91,22 @@
 
 ### 2. 配置项目
 
-编辑 `js/config.js` 文件：
+1. 复制配置模板：
+   ```bash
+   cp js/config.example.js js/config.local.js
+   ```
+
+2. 编辑 `js/config.local.js` 文件，填写您的 R2 配置：
 
 ```javascript
-const R2_CONFIG = {
+const LOCAL_CONFIG = {
     bucketName: 'your-bucket-name',           // 存储桶名称
     endpoint: 'https://your-account-id.r2.cloudflarestorage.com',  // Endpoint
     accessKeyId: 'your-access-key-id',        // Access Key ID
     secretAccessKey: 'your-secret-access-key', // Secret Access Key
     publicUrl: 'https://your-bucket.your-domain.com',  // 公开访问 URL
-    region: 'auto'
+    adminPassword: 'your-admin-password'      // 上传页面密码
 };
-
-const ADMIN_PASSWORD = 'your-admin-password';  // 上传页面密码
 ```
 
 ### 3. 本地预览
