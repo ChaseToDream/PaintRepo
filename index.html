@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>画仓 - AI 绘图作品展示</title>
-    <meta name="description" content="画仓 - 轻量级 AI 绘图作品展示平台">
+    <title>画仓 - AI 创作画廊</title>
+    <meta name="description" content="画仓 - 专业 AI 绘图作品展示平台，支持 ComfyUI 工作流参数">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,7 +16,7 @@
     <nav class="navbar">
         <div class="navbar-inner">
             <a href="index.html" class="navbar-brand">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                     <path d="M2 17l10 5 10-5"/>
                     <path d="M2 12l10 5 10-5"/>
@@ -38,17 +38,37 @@
             </div>
         </div>
     </nav>
-    
+
+    <!-- 统计栏 -->
+    <div class="stats-bar">
+        <div class="stats-inner">
+            <div class="stat-item">
+                <span class="stat-number" id="total-count">0</span>
+                <span class="stat-label">作品</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number" id="models-count">0</span>
+                <span class="stat-label">模型</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number" id="samplers-count">0</span>
+                <span class="stat-label">采样器</span>
+            </div>
+        </div>
+    </div>
+
     <!-- 瀑布流容器 -->
     <main id="masonry-container" class="masonry-container">
         <!-- 图片卡片将通过 JavaScript 动态加载 -->
     </main>
-    
+
     <!-- 页脚 -->
     <footer class="footer">
-        <span id="copyright">© 2024 画仓 All Rights Reserved</span>
+        <span id="copyright">© 2026 画仓 · AI 创作画廊</span>
     </footer>
-    
+
     <!-- 脚本 -->
     <script src="js/config.js"></script>
     <script src="js/r2.js"></script>
