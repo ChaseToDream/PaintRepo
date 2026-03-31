@@ -14,7 +14,7 @@
 const SITE_CONFIG = {
     name: '画仓',
     description: 'AI 绘图作品展示',
-    copyright: '© 2024 画仓 All Rights Reserved'
+    copyright: '© 2026 画仓 · AI 创作画廊'
 };
 
 // R2 配置

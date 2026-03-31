@@ -9,7 +9,7 @@
 const Gallery = {
     theme: 'dark',
     images: [],
-    allParams: {}, // 缓存所有参数用于统计
+    paramsCache: new Map(), // 缓存参数数据
 
     init() {
         this.loadTheme();
@@ -186,22 +186,44 @@ const HomePage = {
             totalEl.textContent = Gallery.images.length;
         }
 
-        // 统计模型和采样器（需要加载参数）
+        // 统计模型和采样器（使用缓存）
         const models = new Set();
         const samplers = new Set();
+        let loadedCount = 0;
+        const maxParallel = 5; // 限制并发请求数
 
-        for (const img of Gallery.images.slice(0, 20)) { // 只统计前20个
-            try {
-                const params = await R2Client.getJson(`params/${img.name}.json`);
-                if (params.model) models.add(params.model);
-                if (params.sampler) samplers.add(params.sampler);
-            } catch (e) {}
+        // 分批加载，避免过多并发请求
+        for (let i = 0; i < Gallery.images.length; i += maxParallel) {
+            const batch = Gallery.images.slice(i, i + maxParallel);
+            const promises = batch.map(async (img) => {
+                try {
+                    let params;
+                    const cacheKey = `params/${img.name}.json`;
+                    
+                    // 检查缓存
+                    if (Gallery.paramsCache.has(cacheKey)) {
+                        params = Gallery.paramsCache.get(cacheKey);
+                    } else {
+                        params = await R2Client.getJson(cacheKey);
+                        Gallery.paramsCache.set(cacheKey, params);
+                    }
+                    
+                    if (params.model) models.add(params.model);
+                    if (params.sampler) samplers.add(params.sampler);
+                } catch (e) {
+                    // 忽略单个加载失败
+                }
+            });
+            
+            await Promise.all(promises);
+            loadedCount += batch.length;
+            
+            // 实时更新统计显示
+            const modelsEl = document.getElementById('models-count');
+            const samplersEl = document.getElementById('samplers-count');
+            if (modelsEl) modelsEl.textContent = models.size;
+            if (samplersEl) samplersEl.textContent = samplers.size;
         }
-
-        const modelsEl = document.getElementById('models-count');
-        const samplersEl = document.getElementById('samplers-count');
-        if (modelsEl) modelsEl.textContent = models.size;
-        if (samplersEl) samplersEl.textContent = samplers.size;
     },
 
     renderImages() {
@@ -229,7 +251,7 @@ const HomePage = {
         const imageUrl = R2Client.getImageUrl(`uploads/${image.name}`);
 
         item.innerHTML = `
-            <img data-src="${imageUrl}" alt="${image.title || 'AI 绘图作品'}" loading="lazy"/>
+            <img data-src="${imageUrl}" alt="${this.escapeHtml(image.title || 'AI 绘图作品')}" loading="lazy"/>
             <div class="card-info">
                 ${image.title ? `<div class="card-title">${this.escapeHtml(image.title)}</div>` : ''}
                 <div class="card-meta">
@@ -388,10 +410,21 @@ const DetailPage = {
                 paramsContainer.innerHTML = '<div class="loading-placeholder" style="min-height: 200px;"></div>';
 
                 try {
-                    const params = await R2Client.getJson(`params/${this.imageName}.json`);
+                    let params;
+                    const cacheKey = `params/${this.imageName}.json`;
+                    
+                    // 检查缓存
+                    if (Gallery.paramsCache.has(cacheKey)) {
+                        params = Gallery.paramsCache.get(cacheKey);
+                    } else {
+                        params = await R2Client.getJson(cacheKey);
+                        Gallery.paramsCache.set(cacheKey, params);
+                    }
+                    
                     this.currentParams = params;
                     this.renderParams(params, paramsContainer);
                 } catch (error) {
+                    console.warn('加载参数失败:', error);
                     paramsContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px 20px;">暂无参数信息</p>';
                 }
             }

@@ -139,26 +139,37 @@ const R2Client = {
      * @returns {Promise<Response>} 响应对象
      */
     async getFile(key) {
+        if (!key) {
+            throw new Error('文件键名不能为空');
+        }
+        
         const method = 'GET';
         const path = `/${R2_CONFIG.bucketName}/${key}`;
         const url = `${R2_CONFIG.endpoint}${path}`;
         
-        const headers = {
-            'Host': new URL(R2_CONFIG.endpoint).host
-        };
-        
-        const signedHeaders = await this.signRequest(method, path, headers, await this.sha256(''));
-        
-        const response = await fetch(url, {
-            method,
-            headers: signedHeaders
-        });
-        
-        if (!response.ok) {
-            throw new Error(`读取文件失败: ${response.status} ${response.statusText}`);
+        try {
+            const headers = {
+                'Host': new URL(R2_CONFIG.endpoint).host
+            };
+            
+            const signedHeaders = await this.signRequest(method, path, headers, await this.sha256(''));
+            
+            const response = await fetch(url, {
+                method,
+                headers: signedHeaders
+            });
+            
+            if (!response.ok) {
+                throw new Error(`读取文件失败: ${response.status} ${response.statusText}`);
+            }
+            
+            return response;
+        } catch (error) {
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                throw new Error('网络连接失败，请检查网络设置');
+            }
+            throw error;
         }
-        
-        return response;
     },
     
     /**
@@ -213,42 +224,56 @@ const R2Client = {
      * @returns {Promise<boolean>} 是否成功
      */
     async uploadFile(key, data, contentType = 'application/octet-stream') {
+        if (!key) {
+            throw new Error('文件键名不能为空');
+        }
+        if (!data) {
+            throw new Error('文件数据不能为空');
+        }
+        
         const method = 'PUT';
         const path = `/${R2_CONFIG.bucketName}/${key}`;
         const url = `${R2_CONFIG.endpoint}${path}`;
         
-        // 转换数据为 ArrayBuffer
-        let body;
-        if (data instanceof Blob || data instanceof File) {
-            body = await data.arrayBuffer();
-        } else if (typeof data === 'string') {
-            body = new TextEncoder().encode(data);
-        } else {
-            body = data;
+        try {
+            // 转换数据为 ArrayBuffer
+            let body;
+            if (data instanceof Blob || data instanceof File) {
+                body = await data.arrayBuffer();
+            } else if (typeof data === 'string') {
+                body = new TextEncoder().encode(data);
+            } else {
+                body = data;
+            }
+            
+            const bodyHash = await this.sha256ArrayBuffer(body);
+            
+            const headers = {
+                'Host': new URL(R2_CONFIG.endpoint).host,
+                'Content-Type': contentType,
+                'X-Amz-Content-Sha256': bodyHash
+            };
+            
+            const signedHeaders = await this.signRequest(method, path, headers, bodyHash);
+            
+            const response = await fetch(url, {
+                method,
+                headers: signedHeaders,
+                body
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`上传文件失败: ${response.status} ${response.statusText}\n${errorText}`);
+            }
+            
+            return true;
+        } catch (error) {
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                throw new Error('网络连接失败，请检查网络设置');
+            }
+            throw error;
         }
-        
-        const bodyHash = await this.sha256ArrayBuffer(body);
-        
-        const headers = {
-            'Host': new URL(R2_CONFIG.endpoint).host,
-            'Content-Type': contentType,
-            'X-Amz-Content-Sha256': bodyHash
-        };
-        
-        const signedHeaders = await this.signRequest(method, path, headers, bodyHash);
-        
-        const response = await fetch(url, {
-            method,
-            headers: signedHeaders,
-            body
-        });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`上传文件失败: ${response.status} ${response.statusText}\n${errorText}`);
-        }
-        
-        return true;
     },
     
     /**
